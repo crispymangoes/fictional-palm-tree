@@ -2,23 +2,39 @@
 
 const fs = require("fs");
 const chalk = require("chalk");
-const { config, ethers, tenderly } = require("hardhat");
-const { utils } = require("ethers");
+const { config, ethers, tenderly, artifacts, upgrades } = require("hardhat");
+const { utils } = require("ethers", "upgrades");
 const R = require("ramda");
+
+
+//const CreativeToken = artifacts.require("../contracts/CreativeToken.sol");
 
 const main = async () => {
 
   //----------------------Deploy Creative Token---------------------------------------------------
   console.log("\n\n 📡 Deploying...\n");
 
-
-  const yourContract = await deploy("CreativeToken") // <-- add in constructor args like line 19 vvvv
-
+  const CreativeToken = await ethers.getContractFactory("CreativeToken");
+  const creatvieToken = await upgrades.deployProxy(CreativeToken, "Creative Token", "CRTV", 18, 1000) // <-- add in constructor args like line 19 vvvv
+  await creatvieToken.deployed();
   console.log(
     " 💾  Artifacts (address, abi, and args) saved to: ",
     chalk.blue("packages/hardhat/artifacts/"),
     "\n\n"
   );
+
+ //----------------------Deploy Creative Vendor Contract ---------------------------------------------------
+ console.log("\n\n 📡 Deploying...\n");
+
+
+ const creativeVendor = await deploy("CreativeVendor", creatvieToken.address) // <-- add in constructor args like line 19 vvvv
+
+ console.log(
+   " 💾  Artifacts (address, abi, and args) saved to: ",
+   chalk.blue("packages/hardhat/artifacts/"),
+   "\n\n"
+ );
+
   // -------------------------------------Deploy AaveApe-----------------------------------------------
 
 
